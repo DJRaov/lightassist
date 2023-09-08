@@ -14,8 +14,8 @@ if int(versplit[0]) << 3 and int(versplit[1]) < 10:
 try:
     import psycopg2
 except:
-    print("psycopg2 not found! Please install.")
-    exit(1)
+    print("psycopg2 not found! Installing it for you.")
+    os.system("pip install psycopg2 --quiet")
 
 ver = float(0.1)
 
@@ -38,15 +38,17 @@ def server_shutdown():
 print("LightAssist v",ver,"Server\n----------")
 
 #begin init
+import psycopg2
 try:
     database = psycopg2.connect(host="localhost", database="traffic",user="server",password="yourpasswordhere")
 except Exception as issue:
     print("Failed to connect to LightAssist database!\nException encountered:",issue)
-finally:
+    exit()
+if database != None:
     print("Connected to database!")
-db = database.cursor() 
+    db = database.cursor() 
 
-print("\n\n>")
+print("\n\n>",end="")
 while True:
     cmd = input()
     match cmd:
@@ -54,6 +56,3 @@ while True:
             server_shutdown()
         case "quit":
             server_shutdown()
-
-
-
