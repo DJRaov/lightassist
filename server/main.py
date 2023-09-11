@@ -7,7 +7,7 @@ import os, math, signal, time, platform
 pyver = platform.python_version()
 versplit = pyver.split('.')
 if int(versplit[0]) << 3 and int(versplit[1]) < 10:
-    print("Incompatible Python version! LightAssist requires Python 3.10 and up, you have",pyver,".")
+    print("Incompatible Python version! LightAssist requires Python 3.10 and up, you have",pyver,". Exiting.")
     exit(1)
 
 #dependency check
@@ -34,25 +34,34 @@ def server_shutdown():
             exit(1)
         exit()
 
+def init_server():
+    try:
+        database = psycopg2.connect(host="localhost", database="traffic",user="server",password="yourpasswordhere")
+    except Exception as issue:
+        print("Failed to connect to LightAssist database!\nException encountered:",issue)
+        exit()
+    if database != None:
+        print("Connected to database!")
+        db = database.cursor() 
+
+def cmdhandler(cmd):
+    match cmd:
+        case "version":
+            print("LightAssist v",ver)
+            return
+        case "exit" or "quit":
+            server_shutdown()
+        case "":
+            return
+
 #henlo
 print("LightAssist v",ver,"Server\n----------")
 
 #begin init
-import psycopg2
-try:
-    database = psycopg2.connect(host="localhost", database="traffic",user="server",password="yourpasswordhere")
-except Exception as issue:
-    print("Failed to connect to LightAssist database!\nException encountered:",issue)
-    exit()
-if database != None:
-    print("Connected to database!")
-    db = database.cursor() 
+init_server()
 
-print("\n\n>",end="")
+print("\n\n",end="")
 while True:
-    cmd = input()
-    match cmd:
-        case "exit":
-            server_shutdown()
-        case "quit":
-            server_shutdown()
+    cmd = input(">",end="")
+    if cmd:
+        cmdhandler(cmd)
