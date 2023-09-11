@@ -1,7 +1,11 @@
 #    __---LightAssist Server---___
 #                v0.1
 
+#import standard libs
 import os, math, signal, time, platform
+
+#import modules
+import server
 
 #python version check
 pyver = platform.python_version()
@@ -19,49 +23,22 @@ except:
 
 ver = float(0.1)
 
+#ctrl-c handler
 def sigint_handler(signum, frame):
     res = input("Do you want to shut down LightAssist Server? (y/N)")
-    if res == 'y':
+    if res == 'y' or "Y":
         server_shutdown()
-
-def server_shutdown():
-    if database != None:
-        try:
-            print("LightAssist Server shutting down!")
-            database.close()
-        except Exception as issue:
-            print("Could not gracefully close database connection! Exception encountered:",issue)
-            exit(1)
-        exit()
-
-def init_server():
-    try:
-        database = psycopg2.connect(host="localhost", database="traffic",user="server",password="yourpasswordhere")
-    except Exception as issue:
-        print("Failed to connect to LightAssist database!\nException encountered:",issue)
-        exit()
-    if database != None:
-        print("Connected to database!")
-        db = database.cursor() 
-
-def cmdhandler(cmd):
-    match cmd:
-        case "version":
-            print("LightAssist v",ver)
-            return
-        case "exit" or "quit":
-            server_shutdown()
-        case "":
-            return
+    if res == "n" or "N":
+        return
 
 #henlo
 print("LightAssist v",ver,"Server\n----------")
 
 #begin init
-init_server()
+server.init_server()
 
 print("\n\n",end="")
 while True:
     cmd = input(">",end="")
     if cmd:
-        cmdhandler(cmd)
+        la_server.cmdhandler(cmd)
